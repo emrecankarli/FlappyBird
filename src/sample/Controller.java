@@ -7,7 +7,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -26,9 +25,7 @@ public class Controller {
     private Label skorLabel;
 
     private double ziplama = 50.0;
-    private double jumpVelocity = -20.0;
-
-    private double yercekimi = 0.02;
+    private double yercekimi = 0.03;
     private double hiz = 0.0;
 
     private double taban = 350.0;
@@ -37,11 +34,12 @@ public class Controller {
     private boolean zipliyor = false;
     private boolean oyundurdu = false;
 
-    private double kolonhizi = 5.0;
+    private double kolonhizi = 1.5;
 
-    private double baslangicY = taban;
+    private int skor = -1;
 
-    private int skor = 0;
+    private Timeline gameLoopTimeline;
+    private Timeline kolonTimeline;
 
     public void initialize() {
         kare.setFocusTraversable(true);
@@ -56,23 +54,19 @@ public class Controller {
     }
 
     public void jump() {
+        if (!zipliyor && !oyundurdu) {
+            zipliyor = true;
+            hiz = 0.0;
 
-        zipliyor = true;
+            Timeline jumpTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(kare.translateYProperty(), kare.getTranslateY())),
+                    new KeyFrame(Duration.millis(150), new KeyValue(kare.translateYProperty(), kare.getTranslateY() - ziplama, Interpolator.EASE_OUT))
+            );
 
-        TranslateTransition translateUp = new TranslateTransition(Duration.seconds(0.25), kare);
-        translateUp.setByY(-ziplama);
-
-        TranslateTransition translateDown = new TranslateTransition(Duration.seconds(0.25), kare);
-        translateDown.setByY(ziplama);
-
-        translateUp.setOnFinished(event -> {
-            translateDown.play();
-            translateDown.setOnFinished(e -> zipliyor = false);
-        });
-
-        translateUp.play();
+            jumpTimeline.setOnFinished(event -> zipliyor = false);
+            jumpTimeline.play();
+        }
     }
-
 
     public void applyyercekimi() {
         hiz += yercekimi;
@@ -90,41 +84,45 @@ public class Controller {
     }
 
     public void startGameLoop() {
-        AnimationTimer gameLoop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
+        gameLoopTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
+            if (!oyundurdu) {
                 applyyercekimi();
+                kolonhareket();
+                carpisma();
             }
-        };
-        gameLoop.start();
+        }));
+        gameLoopTimeline.setCycleCount(Animation.INDEFINITE);
+        gameLoopTimeline.play();
     }
 
     public void kolonanimasyon() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(16), event -> {
+        kolonTimeline = new Timeline(new KeyFrame(Duration.millis(16), e -> {
             if (!oyundurdu) {
                 kolonhareket();
                 carpisma();
             }
         }));
-        timeline.setCycleCount(Animation.INDEFINITE);
-
-        timeline.play();
+        kolonTimeline.setCycleCount(Animation.INDEFINITE);
+        kolonTimeline.play();
     }
 
     public void kolonhareket() {
         kolonust.setTranslateX(kolonust.getTranslateX() - kolonhizi);
         kolonalt.setTranslateX(kolonalt.getTranslateX() - kolonhizi);
 
-        if (kolonust.getTranslateX() + kolonust.getRadius() < kare.getTranslateX()) {
+        if (kolonust.getTranslateX() + kolonust.getRadius() < kare.getTranslateX() && kolonust.getTranslateX() + kolonust.getRadius() > kare.getTranslateX() - kolonhizi) {
             skor++;
             skorLabel.setText(String.valueOf(skor));
         }
 
         if (kolonust.getTranslateX() + kolonust.getRadius() < -500) {
             resetkolonpozisyon(kolonust);
+            resetKolonYukseklik(kolonust);
         }
+
         if (kolonalt.getTranslateX() + kolonalt.getRadius() < -500) {
             resetkolonpozisyon(kolonalt);
+            resetKolonYukseklik(kolonalt);
         }
     }
 
@@ -141,12 +139,13 @@ public class Controller {
                 kare.getBoundsInParent().intersects(kolonalt.getBoundsInParent())) {
             oyundurdu = true;
             oyunbitti();
-            resetleme();
         }
     }
 
     private void oyunbitti() {
         Platform.runLater(() -> {
+            gameLoopTimeline.stop();
+            kolonTimeline.stop();
             Alert gameOverAlert = new Alert(Alert.AlertType.CONFIRMATION);
             gameOverAlert.setTitle("Game Over");
             gameOverAlert.setHeaderText("Kaybettin! Skorun:" + skor);
@@ -175,11 +174,12 @@ public class Controller {
         skor = 0;
         skorLabel.setText(String.valueOf(skor));
         zipliyor = false;
+        // Timeline'ları sıfırla
+        gameLoopTimeline.play();
+        kolonTimeline.play();
     }
 
     private void durdurma() {
         oyundurdu = false;
     }
-
-
 }

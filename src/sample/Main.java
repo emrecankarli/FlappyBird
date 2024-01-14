@@ -1,3 +1,4 @@
+// sample.Main.java
 package sample;
 
 import javafx.application.Application;
@@ -15,8 +16,7 @@ public class Main extends Application {
         primaryStage.setTitle("Gevşek Guş");
         primaryStage.setScene(new Scene(root));
 
-        Controller controller = loader.getController();
-
+        sample.Controller controller = loader.getController(); // sample paketini belirt
 
         root.setFocusTraversable(true);
 
