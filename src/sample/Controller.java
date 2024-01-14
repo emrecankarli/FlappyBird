@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Cylinder;
@@ -21,6 +22,8 @@ public class Controller {
     private Cylinder kolonust;
     @FXML
     private Cylinder kolonalt;
+    @FXML
+    private Label skorLabel;
 
     private double ziplama = 50.0;
     private double jumpVelocity = -20.0;
@@ -37,6 +40,8 @@ public class Controller {
     private double kolonhizi = 5.0;
 
     private double baslangicY = taban;
+
+    private int skor = 0;
 
     public void initialize() {
         kare.setFocusTraversable(true);
@@ -110,13 +115,16 @@ public class Controller {
         kolonust.setTranslateX(kolonust.getTranslateX() - kolonhizi);
         kolonalt.setTranslateX(kolonalt.getTranslateX() - kolonhizi);
 
-        if (kolonust.getTranslateX() + kolonust.getRadius() < -300) {
-            resetkolonpozisyon(kolonust);
-            resetKolonYukseklik(kolonust);
+        if (kolonust.getTranslateX() + kolonust.getRadius() < kare.getTranslateX()) {
+            skor++;
+            skorLabel.setText(String.valueOf(skor));
         }
-        if (kolonalt.getTranslateX() + kolonalt.getRadius() < -300) {
+
+        if (kolonust.getTranslateX() + kolonust.getRadius() < -500) {
+            resetkolonpozisyon(kolonust);
+        }
+        if (kolonalt.getTranslateX() + kolonalt.getRadius() < -500) {
             resetkolonpozisyon(kolonalt);
-            resetKolonYukseklik(kolonalt);
         }
     }
 
@@ -141,7 +149,7 @@ public class Controller {
         Platform.runLater(() -> {
             Alert gameOverAlert = new Alert(Alert.AlertType.CONFIRMATION);
             gameOverAlert.setTitle("Game Over");
-            gameOverAlert.setHeaderText("Kaybettin!");
+            gameOverAlert.setHeaderText("Kaybettin! Skorun:" + skor);
             gameOverAlert.setContentText("Yeniden başlamak ister misin?");
 
             ButtonType evetButton = new ButtonType("Evet");
@@ -164,6 +172,8 @@ public class Controller {
         kare.setTranslateY(0);
         resetkolonpozisyon(kolonust);
         resetkolonpozisyon(kolonalt);
+        skor = 0;
+        skorLabel.setText(String.valueOf(skor));
         zipliyor = false;
     }
 
