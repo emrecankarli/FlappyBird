@@ -17,7 +17,7 @@ public class Main extends Application {
 
         Controller controller = loader.getController();
 
-        // Odaklanabilirlik özelliğini root düğümü üzerinden ayarla
+
         root.setFocusTraversable(true);
 
         primaryStage.show();

@@ -54,15 +54,12 @@ public class Controller {
 
         zipliyor = true;
 
-        // Yüksekliği azalt
         TranslateTransition translateUp = new TranslateTransition(Duration.seconds(0.25), kare);
         translateUp.setByY(-ziplama);
 
-        // Yüksekliği geri al
         TranslateTransition translateDown = new TranslateTransition(Duration.seconds(0.25), kare);
         translateDown.setByY(ziplama);
 
-        // Zıplama animasyonunu bitiminde zıplama durumunu sıfırla
         translateUp.setOnFinished(event -> {
             translateDown.play();
             translateDown.setOnFinished(e -> zipliyor = false);
@@ -106,7 +103,6 @@ public class Controller {
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
 
-        //Anim başlat
         timeline.play();
     }
 
@@ -114,7 +110,6 @@ public class Controller {
         kolonust.setTranslateX(kolonust.getTranslateX() - kolonhizi);
         kolonalt.setTranslateX(kolonalt.getTranslateX() - kolonhizi);
 
-        // Kolonların ekrandan çıkması durumunda tekrar sağa al ve yeni bir yükseklik ataması yap
         if (kolonust.getTranslateX() + kolonust.getRadius() < -300) {
             resetkolonpozisyon(kolonust);
             resetKolonYukseklik(kolonust);
@@ -134,7 +129,6 @@ public class Controller {
     }
 
     private void carpisma() {
-        // Kare ile kolonların çarpışmasını kontrol et
         if (kare.getBoundsInParent().intersects(kolonust.getBoundsInParent()) ||
                 kare.getBoundsInParent().intersects(kolonalt.getBoundsInParent())) {
             oyundurdu = true;
@@ -158,18 +152,15 @@ public class Controller {
             Optional<ButtonType> result = gameOverAlert.showAndWait();
 
             if (result.isPresent() && result.get() == evetButton) {
-                // Yeniden başlamak istendiğinde oyunu sıfırla
                 resetleme();
                 durdurma();
             } else {
-                // Hayır'a basıldığında uygulamayı kapat
                 System.exit(0);
             }
         });
     }
 
     private void resetleme() {
-        // Tüm pozisyonları ve durumları sıfırla
         kare.setTranslateY(0);
         resetkolonpozisyon(kolonust);
         resetkolonpozisyon(kolonalt);
