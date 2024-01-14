@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Rectangle;
@@ -16,7 +17,7 @@ import java.util.Random;
 
 public class Controller {
     @FXML
-    private Rectangle kare;
+    private ImageView kare;
     @FXML
     private Cylinder kolonust;
     @FXML
@@ -51,6 +52,7 @@ public class Controller {
         });
 
         kolonanimasyon();
+
     }
 
     public void jump() {
