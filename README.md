@@ -1,4 +1,4 @@
-# Flappy Bird Clone
+# Flappy Bird Remix JavaFX
 
 Bu proje, JavaFX kullanarak basit bir Flappy Bird klonunu oluşturan bir örnek uygulamadır.
 
